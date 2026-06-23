@@ -232,19 +232,19 @@ html {
 #notif-op-turn::after { content:"Opponent's turn"; }
 
 #notif-north { background-image: url('img/icons/notif_north.png'); }
-#notif-north::after { content:"Northern Realms faction ability triggered - North draws an additional card."; }
+#notif-north::after { content:"United States faction ability triggered - draws an additional card from reserves."; }
 
 #notif-monsters { background-image: url('img/icons/notif_monsters.png'); }
-#notif-monsters::after { content: "Monsters faction ability triggered - one randomly-chosen Monster Unit Card stays on the board"; }
+#notif-monsters::after { content: "Soviet Union faction ability triggered - one randomly-chosen Soviet Unit stays on the battlefield."; }
 
 #notif-scoiatael { background-image: url('img/icons/notif_scoiatael.png'); }
-#notif-scoiatael::after { content: "Opponent used the Scoia'tael faction perk to go first."; }
+#notif-scoiatael::after { content: "Opponent used the Imperial Japan faction perk to strike first."; }
 
 #notif-skellige-op{ background-image: url('img/icons/notif_skellige.png'); }
-#notif-skellige-op::after { content: "Opponent Skellige Ability Triggered!"; }
+#notif-skellige-op::after { content: "Opponent British Commonwealth Ability Triggered!"; }
 
 #notif-skellige-me{ background-image: url('img/icons/notif_skellige.png'); }
-#notif-skellige-me::after { content: "Skellige Ability Triggered!"; }
+#notif-skellige-me::after { content: "British Commonwealth Ability Triggered!"; }
 
 /* ------- card preview ------------- */
 

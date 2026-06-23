@@ -2,27 +2,27 @@
 
 var ability_dict = {
 	clear: {
-		name: "Clear Weather",
-		description: "Removes all Weather Cards (Biting Frost, Impenetrable Fog and Torrential Rain) effects. ",
+		name: "Clear Skies",
+		description: "Removes all weather effects (Russian Winter, Smoke Screen and Heavy Mud). ",
 		audio: "clear"
 	},
 	frost: {
-		name: "Biting Frost",
+		name: "Russian Winter",
 		description: "Sets the strength of all Close Combat cards to 1 for both players. ",
 		audio: "cold"
 	},
 	fog: {
-		name: "Impenetrable Fog",
+		name: "Smoke Screen",
 		description: "Sets the strength of all Ranged Combat cards to 1 for both players. ",
 		audio: "fog"
 	},
 	rain: {
-		name: "Torrential Rain",
+		name: "Heavy Mud",
 		description: "Sets the strength of all Siege Combat cards to 1 for both players. ",
 		audio: "rain"
 	},
 	storm: {
-		name: "Skellige Storm",
+		name: "Atlantic Storm",
 		description: "Reduces the Strength of all Range and Siege Units to 1. ",
 		audio: "rain"
 	},
@@ -31,12 +31,12 @@ var ability_dict = {
 		description: "Not affected by any Special Cards or abilities. "
 	},
 	decoy: {
-		name: "Decoy",
+		name: "Tactical Retreat",
 		audio: "decoy",
 		description: "Swap with a card on the battlefield to return it to your hand. "
 	},
 	horn: {
-		name: "Commander's Horn",
+		name: "General's Command",
 		description: "Doubles the strength of all unit cards in that row. Limited to 1 per row. ",
 		audio: "horn",
 		placed: async card => {
@@ -44,21 +44,21 @@ var ability_dict = {
 		}
 	},
 	mardroeme: {
-		name: "Mardroeme",
-		description: "Triggers transformation of all Berserker cards on the same row. ",
+		name: "Commando Training",
+		description: "Triggers transformation of all Commando cards on the same row. ",
 		placed: async (card, row) => {
 			const berserkers = row.findCards(c => c.abilities.includes("berserker"));
 			await Promise.all(berserkers.map(async c => await ability_dict["berserker"].placed(c, row)));
 		}
 	},
 	berserker: {
-		name: "Berserker",
-		description: "Transforms into a bear when a Mardroeme card is on its row. ",
+		name: "Commando",
+		description: "Transforms into an elite squad when Commando Training is on its row. ",
 		placed: async (card, row) => {
 			if (row.effects.mardroeme === 0)
 				return;
 			row.removeCard(card);
-			const cardId = card.name.indexOf("Young") === -1 ? 206 : 207;
+			const cardId = card.filename.indexOf("young") === -1 ? 206 : 207;
 			await row.addCard(new Card(card_dict[cardId], card.holder));
 		}
 	},
@@ -73,7 +73,7 @@ var ability_dict = {
 		}
 	},
 	scorch: {
-		name: "Scorch",
+		name: "Air Strike",
 		description: "Discard after playing. Kills the strongest card(s) on the battlefield. ",
 		activated: async card => {	
 			await ability_dict["scorch"].placed(card);
@@ -97,17 +97,17 @@ var ability_dict = {
 		}
 	},
 	scorch_c: {
-		name: "Scorch - Close Combat",
+		name: "Air Strike - Close Combat",
 		description: "Destroy your enemy's strongest Close Combat unit(s) if the combined strength of all his or her Close Combat units is 10 or more. ",
 		placed: async (card) => await board.getRow(card, "close", card.holder.opponent()).scorch()
 	},
 	scorch_r: {
-		name: "Scorch - Ranged",
+		name: "Air Strike - Ranged",
 		description: "Destroy your enemy's strongest Ranged Combat unit(s) if the combined strength of all his or her Ranged Combat units is 10 or more. ",
 		placed: async (card) => await board.getRow(card, "ranged", card.holder.opponent()).scorch()
 	},
 	scorch_s: {
-		name: "Scorch - Siege",
+		name: "Air Strike - Siege",
 		description: "Destroys your enemy's strongest Siege Combat unit(s) if the combined strength of all his or her Siege Combat units is 10 or more. ",
 		placed: async (card) => await board.getRow(card, "siege", card.holder.opponent()).scorch()
 	},
@@ -236,8 +236,8 @@ var ability_dict = {
 		}
 	},
 	avenger: {
-		name: "Avenger",
-		description: "When this card is removed from the battlefield, it summons a powerful new Unit Card to take its place. ",
+		name: "Decoy Target",
+		description: "When this decoy is removed from the battlefield, it summons a powerful combat unit to take its place. ",
 		removed: async (card) => {
 			let bdf = new Card(card_dict[21], card.holder);
 			bdf.removed.push( () => setTimeout( () => {
@@ -249,8 +249,8 @@ var ability_dict = {
 		weight: () => 50
 	},
 	avenger_kambi: {
-		name: "Avenger",
-		description: "When this card is removed from the battlefield, it summons a powerful new Unit Card to take its place. ",
+		name: "Decoy Target",
+		description: "When this decoy is removed from the battlefield, it summons a powerful combat unit to take its place. ",
 		removed: async card => {
 			let bdf = new Card(card_dict[196], card.holder);
 			bdf.removed.push( () => setTimeout( () => {
@@ -262,21 +262,21 @@ var ability_dict = {
 		weight: () => 50
 	},
 	foltest_king: {
-		description: "Pick an Impenetrable Fog card from your deck and play it instantly.",
+		description: "Pick a Smoke Screen card from your deck and play it instantly.",
 		activated: async card => {
-			let out = card.holder.deck.findCard(c => c.name === "Impenetrable Fog");
+			let out = card.holder.deck.findCard(c => c.abilities.includes("fog"));
 			if (out)
 				await out.autoplay(card.holder.deck);
 		},
 		weight: (card, ai) => ai.weightWeatherFromDeck(card, "fog")
 	},
 	foltest_lord: {
-		description: "Clear any weather effects (resulting from Biting Frost, Torrential Rain or Impenetrable Fog cards) in play.",
+		description: "Clear any weather effects (resulting from Russian Winter, Heavy Mud or Smoke Screen cards) in play.",
 		activated: async () => await weather.clearWeather(),
-		weight: (card, ai) =>  ai.weightCard( {row:"weather", name:"Clear Weather"} )
+		weight: (card, ai) =>  ai.weightCard( {row:"weather", abilities:["clear"]} )
 	},
 	foltest_siegemaster: {
-		description: "Doubles the strength of all your Siege units (unless a Commander's Horn is also present on that row).",
+		description: "Doubles the strength of all your Siege units (unless a General's Command is also present on that row).",
 		activated: async card => await board.getRow(card, "siege", card.holder).leaderHorn(),
 		weight: (card, ai) => ai.weightHornRow(card, board.getRow(card, "siege", card.holder))
 	},
@@ -291,9 +291,9 @@ var ability_dict = {
 		weight: (card, ai, max) => ai.weightScorchRow(card, max, "ranged")
 	},
 	emhyr_imperial: {
-		description: "Pick a Torrential Rain card from your deck and play it instantly.",
+		description: "Pick a Heavy Mud card from your deck and play it instantly.",
 		activated: async card => {
-			let out = card.holder.deck.findCard(c => c.name === "Torrential Rain");
+			let out = card.holder.deck.findCard(c => c.abilities.includes("rain"));
 			if (out)
 				await out.autoplay(card.holder.deck);
 		},
@@ -343,7 +343,7 @@ var ability_dict = {
 		gameStart: () => game.randomRespawn = true
 	},
 	eredin_commander: {
-		description: "Double the strength of all your Close Combat units (unless a Commander's horn is 	also present on that row).",
+		description: "Double the strength of all your Close Combat units (unless a General's Command is also present on that row).",
 		activated: async card => await board.getRow(card, "close", card.holder).leaderHorn(),
 		weight: (card, ai) => ai.weightHornRow(card, board.getRow(card, "close", card.holder))
 	},
@@ -421,7 +421,7 @@ var ability_dict = {
 		weight: (card, ai, max) => ai.weightScorchRow(card, max, "close")
 	},
 	francesca_beautiful: {
-		description: "Doubles the strength of all your Ranged Combat units (unless a Commander's Horn is also present on that row).",
+		description: "Doubles the strength of all your Ranged Combat units (unless a General's Command is also present on that row).",
 		activated: async card => await board.getRow(card, "ranged", card.holder).leaderHorn(),
 		weight: (card, ai) => ai.weightHornRow(card, board.getRow(card, "ranged", card.holder))
 	},
@@ -436,7 +436,7 @@ var ability_dict = {
 	francesca_pureblood: {
 		description: "Pick a Biting Frost card from your deck and play it instantly.",
 		activated: async card => {
-			let out = card.holder.deck.findCard(c => c.name === "Biting Frost");
+			let out = card.holder.deck.findCard(c => c.abilities.includes("frost"));
 			if (out)
 				await out.autoplay(card.holder.deck);
 		},

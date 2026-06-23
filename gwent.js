@@ -153,13 +153,13 @@ class ControllerAI {
 	
 	// Tells the Player that this object controls to play a card
 	async playCard(c, max, data){
-		if (c.name === "Commander's Horn")
+		if (c.abilities.includes("horn"))
 			await this.horn(c);
-		else if (c.name === "Mardroeme")
+		else if (c.abilities.includes("mardroeme"))
 			await this.mardroeme(c);
-		else if (c.name === "Decoy")
+		else if (c.abilities.includes("decoy"))
 			await this.decoy(c, max, data);
-		else if (c.name === "Scorch")
+		else if (c.abilities.includes("scorch"))
 			await this.scorch(c, max, data);
 		else
 			await this.player.playCard(c);
@@ -324,7 +324,7 @@ class ControllerAI {
 	// Calculates the weight for playing a weather card
 	weightWeather(card) {
 		let rows;
-		if (card.name === "Clear Weather")
+		if (card.abilities && card.abilities.includes("clear"))
 			rows = Object.values(weather.types).filter(t => t.count > 0).flatMap(t => t.rows);
 		else
 			rows = Object.values(weather.types).filter(t => t.count === 0 && t.name === card.abilities[0]).flatMap(t => t.rows);
@@ -388,9 +388,9 @@ class ControllerAI {
 	
 	// Assigns a weights for how likely the controller with play a card from its hand
 	weightCard(card, max, data){
-		if (card.name === "Decoy")
+		if (card.abilities.includes("decoy"))
 			return data.spy.length ? 50 : data.medic.length ? 15 : data.scorch.length  ? 10 : max.me.length ? 1 : 0;
-		if (card.name === "Commander's Horn") {
+		if (card.abilities.includes("horn")) {
 			let rows = [0,1,2].map(i => board.row[i]).filter(r => r.special === null);
 			if (!rows.length)
 				return 0;
@@ -1146,7 +1146,7 @@ class Row extends CardContainer {
 	
 	// Calculates the current power of a card affected by row affects
 	calcCardScore(card) {
-		if (card.name === "decoy")
+		if (card.abilities.includes("decoy"))
 			return 0;
 		let total = card.basePower;
 		if (card.hero)
@@ -1769,7 +1769,7 @@ class Card {
 	
 	// Sets and displays the current power of this card
 	setPower(n){
-		if (this.name === "Decoy")
+		if (this.abilities.includes("decoy"))
 			return;
 		let elem = this.elem.children[0].children[0];
 		if (n !== this.power) {
@@ -1837,7 +1837,7 @@ class Card {
 	
 	// Returns true if card is sent to a Row's special slot
 	isSpecial() {
-		return this.name === "Commander's Horn" || this.name === "Mardroeme";
+		return this.abilities.includes("horn") || this.abilities.includes("mardroeme");
 	}
 
 	isHero() { return this.hero; }
@@ -2063,7 +2063,7 @@ class UI {
 		if (pCard === null || card.holder.hand.cards.includes(card)) {
 			this.setSelectable(null, false);
 			this.showPreview(card);
-		} else if (pCard.name === "Decoy") {
+		} else if (pCard.abilities.includes("decoy")) {
 			this.hidePreview(card);
 			this.enablePlayer(false);
 			board.toHand(card, row);
@@ -2084,16 +2084,16 @@ class UI {
 			await ui.viewCardsInContainer(row);
 			return;
 		}
-		if (this.previewCard.name === "Decoy")
+		if (this.previewCard.abilities.includes("decoy"))
 			return;
 		let card = this.previewCard;
 		let holder = card.holder;
 		this.hidePreview();
 		this.enablePlayer(false);
-		if (card.name === "Scorch"){
+		if (card.abilities.includes("scorch")){
 			this.hidePreview();
 			await ability_dict["scorch"].activated(card);
-		} else if (card.name === "Decoy") {
+		} else if (card.abilities.includes("decoy")) {
 			return;
 		} else {
 			await board.moveTo(card, row, card.holder.hand);
@@ -2270,7 +2270,7 @@ class UI {
 		
 		weather.elem.classList.add("noclick");
 		
-		if (card.name === "Scorch") {
+		if (card.abilities.includes("scorch")) {
 			for (let r of board.row){
 				r.elem.classList.add("row-selectable");
 				r.elem_special.classList.add("row-selectable");
@@ -2292,7 +2292,7 @@ class UI {
 		
 		board.row.forEach( r => r.elem_special.classList.add("noclick") );
 		
-		if (card.name === "Decoy"){
+		if (card.abilities.includes("decoy")){
 			for (let i=0; i<6; ++i) {
 				let r = board.row[i];
 				let units = r.cards.filter(c => c.isUnit());

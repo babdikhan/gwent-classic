@@ -2,7 +2,7 @@
 
 var factions = {
 	realms: {
-		name: "Northern Realms",
+		name: "United States",
 		factionAbility: player => game.roundStart.push( async () => {
 			if (game.roundCount > 1 && game.roundHistory[game.roundCount-2].winner === player) {
 				player.deck.draw(player.hand);
@@ -13,11 +13,11 @@ var factions = {
 		description: "Draw a card from your deck whenever you win a round."
 	},
 	nilfgaard: {
-		name: "Nilfgaardian Empire",
+		name: "German Reich",
 		description: "Wins any round that ends in a draw."
 	},
 	monsters: {
-		name: "Monsters",
+		name: "Soviet Union",
 		factionAbility: player => game.roundEnd.push(() => {
 			const units = board.row.filter( (r,i) => player === player_me ^ i < 3)
 				.reduce((a,r) => r.cards.filter(c => c.isUnit()).concat(a), []);
@@ -35,11 +35,11 @@ var factions = {
 		description: "Keeps a random Unit Card out after each round."
 	},
 	scoiatael: {
-		name: "Scoia'tael",
+		name: "Imperial Japan",
 		factionAbility: player => game.gameStart.push( async () => {
 			let notif = "";
 			if (player === player_me) {
-				await ui.popup("Go First", () => game.firstPlayer = player, "Let Opponent Start", () => game.firstPlayer = player.opponent(), "Would you like to go first?", "The Scoia'tael faction perk allows you to decide who will get to go first.", 0.55);
+				await ui.popup("Go First", () => game.firstPlayer = player, "Let Opponent Start", () => game.firstPlayer = player.opponent(), "Would you like to go first?", "The Imperial Japan faction perk allows you to decide who will get to go first.", 0.55);
 				notif = game.firstPlayer.tag + "-first";
 			} else if (player.hand instanceof HandAI) {
 				if (Math.random() < 0.5) {
@@ -58,7 +58,7 @@ var factions = {
 		description: "Decides who takes first turn."
 	},
 	skellige: {
-		name: "Skellige",
+		name: "British Commonwealth",
 		factionAbility: player => game.roundStart.push( async () => {
 			if (game.roundCount != 3)
 				return false;
